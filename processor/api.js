@@ -1,11 +1,11 @@
 var express		= require('express');
 var router		= express.Router();
-
-router.get('/api/:phrase/:order/:page', function(req, res){
+var api_key	= "h2PhtyLa0ScGTMGtH8K9GGQTJlGR0wup";
+router.get('/api/search_news/:phrase/:order/:page', function(req, res){
 	var phrase	= req.params.phrase;
 	var order	= req.params.order;
 	var page 	= req.params.page;
-	var api_key	= "h2PhtyLa0ScGTMGtH8K9GGQTJlGR0wup";
+	
 	var filter	= "";
 	var fb = [];
 	filter		= filter + "&q="+phrase;
@@ -61,6 +61,36 @@ router.get('/api/:phrase/:order/:page', function(req, res){
 	})
 	.catch(function (error) {
 		res.send(JSON.stringify(fb));
+	})
+});
+
+router.get('/api/search_book/:phrase/:order', function(req, res){
+	var phrase	= req.params.phrase;
+	phrase = phrase.toUpperCase();
+	var order	= req.params.order;
+	var url		= "https://api.nytimes.com/svc/books/v3/lists.json?list="+order+"&api-key="+api_key;
+	var fb = [];
+	req.app.get('axios').get(url)
+	.then(function (response) {
+		var index = 0;
+		if(response.data.status!="ERROR"){
+			for(x=0;x<response.data.results.length;x++){
+				if(response.data.results[x].book_details[0].title.indexOf(phrase)>-1){
+					var buff = {};
+					buff.title= response.data.results[x].book_details[0].title;
+					buff.description = response.data.results[x].book_details[0].description;
+					buff.contributor = response.data.results[x].book_details[0].contributor;
+					buff.author = response.data.results[x].book_details[0].author;
+					buff.publisher = response.data.results[x].book_details[0].publisher;
+					buff.primary_isbn13 =response.data.results[x].book_details[0].primary_isbn13;
+					fb.push(buff);
+				}
+			}
+			res.send(JSON.stringify(fb))
+		}
+	})
+	.catch(function (error) {
+		res.send(error);
 	})
 });
 

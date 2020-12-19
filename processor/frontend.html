@@ -43,7 +43,7 @@ modal
 			let time_  = $(".time_").val();
 			$.ajax({
 				type: 'GET',
-				url: '../api/'+phrase+'/'+time_+'/1',
+				url: '../api/search_news/'+phrase+'/'+time_+'/1',
 				beforeSend: function() {
 					$(".rs").html("Wait ...");
 					$(".more_btn").hide();
@@ -65,7 +65,7 @@ modal
 			let time_  = $(".time_").val();
 			$.ajax({
 				type: 'GET',
-				url: '../api/'+phrase+'/'+time_+'/'+page,
+				url: '../api/search_news/'+phrase+'/'+time_+'/'+page,
 				beforeSend: function() {
 					$(".more_btn").val("wait ...");
 				},
