@@ -1,0 +1,109 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div style="width:90%;position:absolute;z-index:100;background-color:white;margin-left:4%;" class='modal' >
+modal
+</div>
+<div
+	style="margin:0 auto;width:90%;background-color:white;"
+>
+	<div style="text-align:right;">
+	<h3>NYTIMES AGGREGATOR API DEMO </h3>
+	</div>
+	
+	<div style="text-align:left;margin-left:10px;">
+		<input type="text" placeholder="Serach News" class="phrase" />&nbsp;&nbsp;
+		<select class="time_" >
+			<option value="oldest" >Oldest</option>
+			<option value="newest" >Newest</option>
+		</select>&nbsp;&nbsp;
+		<input type="button" value="Search" class="news_btn" />&nbsp;&nbsp;|
+		
+		<input type="text" placeholder="Serach Book" />&nbsp;&nbsp;
+		<select>
+			<option value="e-book-fiction" >e-book-fiction</option>
+			<option value="hardcover-fiction" >hardcover-fiction</option>
+		</select>&nbsp;&nbsp;
+		<input type="button" value="Search" class="book_btn" />&nbsp;&nbsp;|
+	</div>
+	<div class="rs" style="text-align:left;margin-left:10px;">
+	
+	</div>
+	<div style="text-align:left;margin-left:10px;">
+		<input type='button' value='More' style='width:100px;color:blue;height:30px;' class='more_btn' /><br/><br/>
+	</div>
+</div>
+
+<script>
+	var page = 1;
+	var state = [];
+	$(document).ready(function() {
+		$(".modal").hide();
+		$(".more_btn").hide();
+		$(".news_btn").click(function(){	
+			let phrase = $(".phrase").val();
+			let time_  = $(".time_").val();
+			$.ajax({
+				type: 'GET',
+				url: '../api/'+phrase+'/'+time_+'/1',
+				beforeSend: function() {
+					$(".rs").html("Wait ...");
+					$(".more_btn").hide();
+				},
+				success: function(result){
+					result = JSON.parse(result);
+					state.push(result);
+					$(".rs").html("");
+					for(x=0;x<result.length;x++){
+						$(".rs").append("<span style='cursor:pointer'  onclick='detail("+result[x].id+")'><h3>"+result[x].title+"</h3></span>");
+					}
+					$(".more_btn").show();
+				}
+			});
+		});
+		$(".more_btn").click(function(){
+			page = page +1;
+			let phrase = $(".phrase").val();
+			let time_  = $(".time_").val();
+			$.ajax({
+				type: 'GET',
+				url: '../api/'+phrase+'/'+time_+'/'+page,
+				beforeSend: function() {
+					$(".more_btn").val("wait ...");
+				},
+				success: function(result){
+					result = JSON.parse(result);
+					state.push(result);
+					for(x=0;x<result.length;x++){
+						$(".rs").append("<span style='cursor:pointer'  onclick='detail("+result[x].id+")'><h3>"+result[x].title+"</h3></span>");
+					}
+					$(".more_btn").val("More");
+				}
+			});
+		});
+		
+	});
+	
+	function detail(y){
+		for(z=0;z<state.length;z++){
+			for(a=0;a<state[z].length;a++){
+				if(state[z][a].id==y){
+					$(".modal").show();
+					let fb = "";
+					fb = fb + "<div style='margin-left:10px;'>";
+					fb = fb + "<h1>"+state[z][a].title+"</h1>";
+					fb = fb + "<p>"+state[z][a].abstract+"</p>";
+					if(state[z][a].img!=""){
+						fb = fb + "<p><img src='"+state[z][a].img+"' style='width:200px;' /></p>";
+					}
+					fb = fb + "<p>"+state[z][a].content+"</p><br/><br/><br/></div>";
+					fb = fb + "<div style='margin-left:10px;'><input type='button' value='Close' onclick='$(\".modal\").hide()' /><br/><br/></div>";
+					$(".modal").html(fb);
+				}
+			}
+		}
+	}
+</script>
+<style>
+	body{
+		background-color:grey;
+	}
+</style>
