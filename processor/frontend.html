@@ -17,10 +17,10 @@ modal
 		</select>&nbsp;&nbsp;
 		<input type="button" value="Search" class="news_btn" />&nbsp;&nbsp;|
 		
-		<input type="text" placeholder="Serach Book" />&nbsp;&nbsp;
-		<select>
-			<option value="e-book-fiction" >e-book-fiction</option>
+		<input type="text" placeholder="Serach Book, example: player" class="phrase2" style="width:250px;" />&nbsp;&nbsp;
+		<select class="type_">
 			<option value="hardcover-fiction" >hardcover-fiction</option>
+			<option value="e-book-fiction" >e-book-fiction</option>
 		</select>&nbsp;&nbsp;
 		<input type="button" value="Search" class="book_btn" />&nbsp;&nbsp;|
 	</div>
@@ -81,6 +81,33 @@ modal
 		});
 		
 	});
+	
+	$(".book_btn").click(function(){	
+			let phrase = $(".phrase2").val();
+			let type_  = $(".type_").val();
+			$.ajax({
+				type: 'GET',
+				url: '../api/search_book/'+phrase+'/'+type_,
+				beforeSend: function() {
+					$(".rs").html("Wait ...");
+					$(".more_btn").hide();
+				},
+				success: function(result){
+					result = JSON.parse(result);
+					$(".rs").html("");
+					for(x=0;x<result.length;x++){
+						var str = "";
+						str = str + "<h3>"+result[x].title+"</h3>";
+						str = str + "<p>"+result[x].description+"</p>";
+						str = str + "contributor: "+result[x].contributor+"<br/>";
+						str = str + "author: "+result[x].author+"<br/>";
+						str = str + "publisher: "+result[x].publisher+"<br/>";
+						str = str + "primary_isbn13: "+result[x].primary_isbn13+"<br/><hr/>";
+						$(".rs").append(str);
+					}
+				}
+			});
+		});
 	
 	function detail(y){
 		for(z=0;z<state.length;z++){
